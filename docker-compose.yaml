@@ -1,0 +1,44 @@
+version: "3.5"
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${APP_NAME}-nginx
+    working_dir: /var/www
+    environment:
+      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
+      TZ: ${TIMEZONE}
+    ports:
+      - ${NGINX_PORT}:80
+    volumes:
+      - ./:/var/www/html/
+      - ./var/log/nginx:/var/log/nginx
+      - ./docker/nginx/templates/default.conf.template:/etc/nginx/templates/default.conf.template
+
+  php:
+    build:
+      context: ./docker/php
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT}
+        XDEBUG_IDEKEY: ${XDEBUG_IDEKEY}
+    container_name: ${APP_NAME}-php
+    env_file:
+      - ./.env
+    environment:
+      TZ: ${TIMEZONE}
+      PHP_IDE_CONFIG: "serverName=${NGINX_SERVER_NAME}"
+    volumes:
+      - ./:/var/www/html/:rw
+
+  db:
+    image: mysql:${MYSQL_VERSION}
+    container_name: ${APP_NAME}-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: ${TIMEZONE}
+    volumes:
+      - ./var/db:/var/lib/mysql:rw

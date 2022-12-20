@@ -1,0 +1,17 @@
+{
+    "name": "inven/crystal",
+    "description": "The Crystal Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "inven"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {}
+}
